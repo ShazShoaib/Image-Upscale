@@ -5,7 +5,7 @@ from functools import partial
 from Upscale import *
 
 file_path = ""
-def temp(a,b):
+def upscale_command():
     if file_path == '':
         return
     iter = str(text_box.get("1.0",'end-1c'))
@@ -39,7 +39,6 @@ text_box = tk.Text(root)
 text_box.configure(font=font_tuple)
 text_box.place(x=350, y=25, height=20, width=20)
 
-upscale_command = partial(temp,file_path,text_box.get("1.0",'end-1c'))
 upscale_button = tk.Button(root, text="Upscale", command= upscale_command)
 upscale_button.place(x=150, y=65, height=40, width=100)
 
