@@ -1,6 +1,15 @@
 from PIL import Image
 from math import floor
 
+def get_color_list():
+    rgb_list = []
+    for i in range(255):
+        Row = []
+        for j in range(255):
+            Row.append((i,0,j))
+        rgb_list.append(Row)
+    return rgb_list
+
 def input_image(file='input.png'):
     # Open the image file
     image = Image.open(file)
@@ -38,6 +47,42 @@ def render_image(rgb_list, output_file='output.png'):
     # Save the image to the output file
     image.save(output_file)
 
+def upscale(pixels2D):
+    pixel_pos = []
+    for i in range(len(pixels2D)):
+        for j in range(len(pixels2D[0])):
+            pixel = pixels2D[i][j]
+            for c in range(3):
+                for k in range(3):
+                    pixel_pos.append((pixel,(i-1+c,j-1+k)))
+
+
+    for i in range(len(pixels2D)):
+        for j in range(len(pixels2D[0])):
+            for pair in pixel_pos:
+                pixel = pair[0]
+                pos = pair[1]
+                num = 0
+                sum = []
+                if pos == (i,j):
+                    num = num + 1
+                    sum.append(pixel)
+                if num == 0:
+                    continue
+                avgR = 0
+                avgG = 0
+                avgB = 0
+                for val in sum:
+                    avgR = avgR + val[0]
+                    avgG = avgG + val[1]
+                    avgB = avgB + val[2]
+                avgR = avgR // num
+                avgG = avgG // num
+                avgB = avgB // num
+                pixels2D[i][j] = (avgR,avgG,avgB)
+            print(i,j)
+        render_image(pixels2D,'temp.png')
+    return pixels2D
 
 def interpolate_cols(pixels2D):
     interpolated = []
@@ -79,10 +124,17 @@ rgb_list = [
     [(255,190, 64), (255, 200, 150), (255,220,190), (255,240,200)]
 ]
 
-#rgb_list = input_image('input.bmp')
-#render_image(rgb_list)
-#upscaled_image = bilinear('output2.png','output2.png')
+def interpolateGUI(image_path,iterations):
+    rgb_list = input_image(image_path)
+    for i in range(iterations):
+        render_image(interpolate(rgb_list),image_path)
+        rgb_list = input_image(image_path)
+        print("Iteration Complete :" + str(i+1) + " / " + str(iterations))
 
-rgb_list = input_image('input.bmp')
-render_image(rgb_list)
-render_image(interpolate(rgb_list),'output.png')
+#rgb_list = input_image('OP.jpeg')
+
+#render_image(rgb_list)
+#render_image(upscale(rgb_list),'output2.png')
+#for i in range(5):
+#    render_image(interpolate(rgb_list),'output3.png')
+#    rgb_list = input_image('output3.png')
